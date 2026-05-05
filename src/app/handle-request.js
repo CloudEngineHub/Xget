@@ -16,6 +16,7 @@ import {
   resolveTarget
 } from '../routing/resolve-target.js';
 import { getDefaultCache, tryReadCachedResponse } from '../upstream/cache.js';
+import { resolveCachePolicy } from '../upstream/cache-policy.js';
 import { fetchUpstreamResponse } from '../upstream/fetch-upstream.js';
 import { PerformanceMonitor, addPerformanceHeaders } from '../utils/performance.js';
 import { addCorsHeaders, addSecurityHeaders, createErrorResponse } from '../utils/security.js';
@@ -113,11 +114,22 @@ export async function handleRequest(request, env, ctx) {
               );
               const canUseCache = request.method === 'GET' || request.method === 'HEAD';
               const shouldPassthroughRequest = isProtocolRequest(requestContext) || !canUseCache;
+              const cachePolicy = resolveCachePolicy({
+                canUseCache,
+                config,
+                effectivePath,
+                hasSensitiveHeaders,
+                platform,
+                request,
+                requestContext,
+                targetUrl
+              });
               const cache = getDefaultCache();
 
               response = await tryReadCachedResponse({
                 cache,
                 cacheTargetUrl,
+                cachePolicy,
                 canUseCache,
                 hasSensitiveHeaders,
                 monitor,
@@ -131,6 +143,7 @@ export async function handleRequest(request, env, ctx) {
                   responseGeneratedLocally: upstreamResponseGeneratedLocally
                 } = await fetchUpstreamResponse({
                   authorization,
+                  cachePolicy,
                   canUseCache,
                   config,
                   effectivePath,
@@ -155,6 +168,7 @@ export async function handleRequest(request, env, ctx) {
                   requestContext,
                   response: upstreamResponse,
                   responseGeneratedLocally: upstreamResponseGeneratedLocally,
+                  targetUrl,
                   url
                 });
               }

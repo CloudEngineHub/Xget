@@ -153,10 +153,11 @@ supported platform URL to Xget's acceleration format with one click
   - Automatic error recovery, improved download success rate
   - Timeout detection and interruption handling
 - **Efficient Caching Strategy**:
-  - 1800 seconds (30 minutes) default cache duration, significantly reduces
-    origin server pressure
+  - Strategy-based cache durations keep mutable metadata fresh while caching
+    immutable artifacts longer
   - Git operations skip caching to ensure real-time data
-  - Edge caching based on Cloudflare Cache API
+  - Edge caching based on Cloudflare Cache API and Cloudflare fetch cache
+    controls
 - **Performance Monitoring System**:
   - Built-in `PerformanceMonitor` class for real-time tracking of request stage
     durations
@@ -2889,7 +2890,7 @@ export const CONFIG = {
   TIMEOUT_SECONDS: 30, // Request timeout (seconds)
   MAX_RETRIES: 3, // Maximum retry count
   RETRY_DELAY_MS: 1000, // Retry delay (milliseconds)
-  CACHE_DURATION: 1800, // Cache duration (1800 seconds = 30 minutes)
+  CACHE_DURATION: 300, // Fallback mutable cache duration (300 seconds = 5 minutes)
   SECURITY: {
     ALLOWED_METHODS: ['GET', 'HEAD'], // Base allowlist for regular requests; protocol traffic has broader built-in allowances
     ALLOWED_ORIGINS: ['*'], // Allowed CORS origins
@@ -2900,8 +2901,8 @@ export const CONFIG = {
 
 ### Performance Tuning Recommendations
 
-- **Cache Optimization**: Adjust `CACHE_DURATION` based on usage patterns,
-  reduce appropriately for frequently updated repositories
+- **Cache Optimization**: Adjust the `CACHE_DURATION` fallback value based on
+  usage patterns; metadata and immutable artifacts use built-in policy TTLs
 - **Timeout Settings**: Increase `TIMEOUT_SECONDS` appropriately for poor
   network conditions
 - **Retry Strategy**: Increase `MAX_RETRIES` and `RETRY_DELAY_MS` in

@@ -21,6 +21,7 @@ import {
   rewriteTextResponse,
   shouldRewriteTextResponse
 } from '../utils/rewrite.js';
+import { resolveCachePolicy } from '../upstream/cache-policy.js';
 import { addSecurityHeaders, createErrorResponse } from '../utils/security.js';
 
 /**
@@ -95,6 +96,7 @@ async function finalizeErrorResponse({ requestContext, response, responseGenerat
  *     isHF: boolean
  *   },
  *   response: Response,
+ *   targetUrl?: string,
  *   url: URL
  * }} options
  * @returns {Promise<Response>} Final proxied response.
@@ -112,6 +114,7 @@ async function finalizeSuccessfulResponse({
   request,
   requestContext,
   response,
+  targetUrl = cacheTargetUrl,
   url
 }) {
   const { isAI, isDocker, isGit, isGitLFS, isHF } = requestContext;
@@ -140,18 +143,27 @@ async function finalizeSuccessfulResponse({
     headers.set('Content-Length', String(rewrittenContentLength));
   }
 
+  const cachePolicy = resolveCachePolicy({
+    canUseCache,
+    config,
+    effectivePath,
+    hasOriginBoundRewrite,
+    hasSensitiveHeaders,
+    platform,
+    request,
+    requestContext,
+    targetUrl
+  });
+
   if (!isGit && !isGitLFS && !isDocker && !isAI && !isHF) {
-    if (!canUseCache || hasOriginBoundRewrite) {
-      headers.set('Cache-Control', 'no-store');
-    } else if (hasSensitiveHeaders) {
-      headers.set('Cache-Control', 'private, no-store');
+    headers.set('Cache-Control', cachePolicy.cacheControl);
+
+    if (cachePolicy.mode === 'private') {
       const existingVary = headers.get('Vary');
       headers.set(
         'Vary',
         existingVary ? `${existingVary}, Authorization, Cookie` : 'Authorization, Cookie'
       );
-    } else {
-      headers.set('Cache-Control', `public, max-age=${config.CACHE_DURATION}`);
     }
 
     headers.set('X-Content-Type-Options', 'nosniff');
@@ -178,13 +190,7 @@ async function finalizeSuccessfulResponse({
 
   if (
     cache &&
-    !isGit &&
-    !isGitLFS &&
-    !isDocker &&
-    !isAI &&
-    !isHF &&
-    !hasOriginBoundRewrite &&
-    !hasSensitiveHeaders &&
+    cachePolicy.allowCacheApi &&
     request.method === 'GET' &&
     finalizedResponse.ok &&
     finalizedResponse.status === 200
@@ -250,6 +256,7 @@ async function finalizeSuccessfulResponse({
  *   },
  *   response: Response,
  *   responseGeneratedLocally: boolean,
+ *   targetUrl?: string,
  *   url: URL
  * }} options
  * @returns {Promise<Response>} Final response returned to the client.
@@ -268,6 +275,7 @@ export async function finalizeResponse({
   requestContext,
   response,
   responseGeneratedLocally,
+  targetUrl = cacheTargetUrl,
   url
 }) {
   const errorResponse = await finalizeErrorResponse({
@@ -297,6 +305,7 @@ export async function finalizeResponse({
     request,
     requestContext,
     response: errorResponse,
+    targetUrl,
     url
   });
 }

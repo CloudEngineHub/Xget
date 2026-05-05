@@ -47,6 +47,27 @@ describe('Cache Privacy', () => {
     expect(response.status).toBe(200);
     expect(cacheDefault.match).not.toHaveBeenCalled();
     expect(cacheDefault.put).not.toHaveBeenCalled();
+    expect(fetchStub).toHaveBeenCalled();
+    expect(fetchStub.mock.calls[0][1]?.cf).toBeUndefined();
+    expect(response.headers.get('Cache-Control')).toBe('private, no-store');
+  });
+
+  it('should not enable Cloudflare fetch caching for requests with Cookie', async () => {
+    const request = new Request('https://example.com/gh/test/repo/file.txt', {
+      method: 'GET',
+      headers: {
+        Cookie: 'session=secret'
+      }
+    });
+
+    const ctx = { waitUntil: () => {}, passThroughOnException: () => {} };
+    const response = await worker.fetch(request, {}, ctx);
+
+    expect(response.status).toBe(200);
+    expect(cacheDefault.match).not.toHaveBeenCalled();
+    expect(cacheDefault.put).not.toHaveBeenCalled();
+    expect(fetchStub).toHaveBeenCalled();
+    expect(fetchStub.mock.calls[0][1]?.cf).toBeUndefined();
     expect(response.headers.get('Cache-Control')).toBe('private, no-store');
   });
 

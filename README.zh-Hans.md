@@ -125,9 +125,9 @@
   - 自动错误恢复，提高下载成功率
   - 超时检测和中断处理
 - **高效缓存策略**：
-  - 1800 秒（30 分钟）默认缓存时长，显著减少源站压力
+  - 基于策略的缓存时长，让可变元数据保持新鲜，同时对不可变制品使用更长缓存
   - Git 操作跳过缓存，确保实时性
-  - 基于 Cloudflare Cache API 的边缘缓存
+  - 基于 Cloudflare Cache API 和 Cloudflare fetch 缓存控制的边缘缓存
 - **性能监控系统**：
   - 内置 `PerformanceMonitor` 类，实时追踪请求各阶段耗时
   - 通过 `X-Performance-Metrics` 响应头提供详细性能数据
@@ -2805,7 +2805,7 @@ export const CONFIG = {
   TIMEOUT_SECONDS: 30, // 请求超时时间（秒）
   MAX_RETRIES: 3, // 最大重试次数
   RETRY_DELAY_MS: 1000, // 重试延迟时间（毫秒）
-  CACHE_DURATION: 1800, // 缓存持续时间（1800秒 = 30分钟）
+  CACHE_DURATION: 300, // 可变资源兜底缓存时长（300秒 = 5分钟）
   SECURITY: {
     ALLOWED_METHODS: ['GET', 'HEAD'], // 常规请求的基础允许列表；协议流量内置了更宽的允许范围
     ALLOWED_ORIGINS: ['*'], // 允许的 CORS 源
@@ -2816,7 +2816,7 @@ export const CONFIG = {
 
 ### 性能调优建议
 
-- **缓存优化**：根据使用模式调整 `CACHE_DURATION`，频繁更新的存储库可适当降低
+- **缓存优化**：根据使用模式调整 `CACHE_DURATION` 兜底值；元数据和不可变制品会使用内置策略化 TTL
 - **超时设置**：网络条件较差时可适当增加 `TIMEOUT_SECONDS`
 - **重试策略**：高延迟环境下可增加 `MAX_RETRIES` 和 `RETRY_DELAY_MS`
 

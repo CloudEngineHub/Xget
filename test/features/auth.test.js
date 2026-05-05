@@ -103,7 +103,7 @@ describe('Authentication Header Forwarding', () => {
     expect(new Headers(fetchSpy.mock.calls[0][1]?.headers).get('Authorization')).toBe(authToken);
     expect(cacheDefault.match).not.toHaveBeenCalled();
     expect(cacheDefault.put).not.toHaveBeenCalled();
-    expect(response.headers.get('Cache-Control')).toBe('no-store');
+    expect(response.headers.get('Cache-Control')).toBe('private, no-store');
   });
 
   it('forwards Authorization for gated Hugging Face model downloads', async () => {

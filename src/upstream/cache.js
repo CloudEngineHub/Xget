@@ -37,6 +37,7 @@ export function getDefaultCache() {
  * @param {{
  *   cache: Cache | null,
  *   cacheTargetUrl: string,
+ *   cachePolicy?: { allowCacheApi: boolean },
  *   canUseCache: boolean,
  *   hasSensitiveHeaders: boolean,
  *   monitor: import('../utils/performance.js').PerformanceMonitor,
@@ -54,6 +55,7 @@ export function getDefaultCache() {
 export async function tryReadCachedResponse({
   cache,
   cacheTargetUrl,
+  cachePolicy,
   canUseCache,
   hasSensitiveHeaders,
   monitor,
@@ -64,6 +66,7 @@ export async function tryReadCachedResponse({
 
   if (
     !cache ||
+    (cachePolicy && !cachePolicy.allowCacheApi) ||
     !canUseCache ||
     isGit ||
     isGitLFS ||

@@ -126,9 +126,9 @@
   - 自動錯誤恢復，提高下載成功率
   - 逾時檢測和中斷處理
 - **高效快取策略**：
-  - 1800 秒（30 分鐘）預設快取時長，顯著減少原始伺服器壓力
+  - 基於策略的快取時長，讓可變中繼資料保持新鮮，同時對不可變製品使用更長快取
   - Git 操作跳過快取，確保即時性
-  - 基於 Cloudflare Cache API 的邊緣快取
+  - 基於 Cloudflare Cache API 和 Cloudflare fetch 快取控制的邊緣快取
 - **效能監控系統**：
   - 內建 `PerformanceMonitor` 類別，即時追蹤請求各階段耗時
   - 透過 `X-Performance-Metrics` 回應標頭提供詳細效能數據
@@ -2805,7 +2805,7 @@ export const CONFIG = {
   TIMEOUT_SECONDS: 30, // 請求逾時時間（秒）
   MAX_RETRIES: 3, // 最大重試次數
   RETRY_DELAY_MS: 1000, // 重試延遲時間（毫秒）
-  CACHE_DURATION: 1800, // 快取持續時間（1800秒 = 30分鐘）
+  CACHE_DURATION: 300, // 可變資源兜底快取時長（300秒 = 5分鐘）
   SECURITY: {
     ALLOWED_METHODS: ['GET', 'HEAD'], // 常規請求的基礎允許清單；協定流量內建了更寬的允許範圍
     ALLOWED_ORIGINS: ['*'], // 允許的 CORS 來源
@@ -2816,7 +2816,7 @@ export const CONFIG = {
 
 ### 效能調優建議
 
-- **快取最佳化**：根據使用模式調整 `CACHE_DURATION`，頻繁更新的儲存庫可適當降低
+- **快取最佳化**：根據使用模式調整 `CACHE_DURATION` 兜底值；中繼資料和不可變製品會使用內建策略化 TTL
 - **逾時設定**：網路條件較差時可適當增加 `TIMEOUT_SECONDS`
 - **重試策略**：高延遲環境下可增加 `MAX_RETRIES` 和 `RETRY_DELAY_MS`
 

@@ -35,6 +35,7 @@ const MEDIA_FILE_PATTERN =
  * Creates upstream fetch options for the current request.
  * @param {{
  *   authorization: string | null,
+ *   cachePolicy?: { allowFetchCache: boolean, edgeTtl: number },
  *   canUseCache: boolean,
  *   config: import('../config/index.js').ApplicationConfig,
  *   request: Request,
@@ -53,6 +54,7 @@ const MEDIA_FILE_PATTERN =
  */
 function createFetchOptions({
   authorization,
+  cachePolicy,
   canUseCache,
   config,
   request,
@@ -97,14 +99,16 @@ function createFetchOptions({
     return { fetchOptions, requestHeaders };
   }
 
-  Object.assign(fetchOptions, {
-    cf: {
-      http3: true,
-      cacheTtl: config.CACHE_DURATION,
-      cacheEverything: true,
-      preconnect: true
-    }
-  });
+  if (!cachePolicy || cachePolicy.allowFetchCache) {
+    Object.assign(fetchOptions, {
+      cf: {
+        http3: true,
+        cacheTtl: cachePolicy ? cachePolicy.edgeTtl : config.CACHE_DURATION,
+        cacheEverything: true,
+        preconnect: true
+      }
+    });
+  }
 
   requestHeaders.set('Accept-Encoding', 'gzip, deflate, br');
   requestHeaders.set('Connection', 'keep-alive');
@@ -307,6 +311,7 @@ async function retryDockerWithAnonymousToken({
  * Fetches an upstream resource with retries and protocol-specific handling.
  * @param {{
  *   authorization: string | null,
+ *   cachePolicy?: { allowFetchCache: boolean, edgeTtl: number },
  *   canUseCache: boolean,
  *   config: import('../config/index.js').ApplicationConfig,
  *   effectivePath: string,
@@ -328,6 +333,7 @@ async function retryDockerWithAnonymousToken({
  */
 export async function fetchUpstreamResponse({
   authorization,
+  cachePolicy,
   canUseCache,
   config,
   effectivePath,
@@ -342,6 +348,7 @@ export async function fetchUpstreamResponse({
   let responseGeneratedLocally = false;
   const { fetchOptions, requestHeaders } = createFetchOptions({
     authorization,
+    cachePolicy,
     canUseCache,
     config,
     request,
