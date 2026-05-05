@@ -282,4 +282,57 @@ describe('Pipeline modules', () => {
       expect(targetA.cacheTargetUrl).not.toBe(targetB.cacheTargetUrl);
     }
   });
+
+  it('handles Docker 401 responses without auth challenges during finalization', async () => {
+    const request = new Request('https://example.com/cr/ghcr/v2/user/repo/manifests/latest');
+    const requestContext = {
+      ...createRequestContext(request, {}),
+      isDocker: true
+    };
+
+    const customUnauthorized = await finalizeResponse({
+      cache: null,
+      cacheTargetUrl: 'https://ghcr.io/v2/user/repo/manifests/latest',
+      canUseCache: false,
+      config: CONFIG,
+      ctx: /** @type {ExecutionContext} */ ({ waitUntil() {}, passThroughOnException() {} }),
+      effectivePath: '/cr/ghcr/v2/user/repo/manifests/latest',
+      hasSensitiveHeaders: false,
+      monitor: new PerformanceMonitor(),
+      platform: 'cr-ghcr',
+      request,
+      requestContext,
+      response: new Response('{"errors":[{"code":"UNAUTHORIZED"}]}', {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' }
+      }),
+      responseGeneratedLocally: false,
+      url: new URL(request.url)
+    });
+
+    const plainUnauthorized = await finalizeResponse({
+      cache: null,
+      cacheTargetUrl: 'https://ghcr.io/v2/user/repo/manifests/latest',
+      canUseCache: false,
+      config: CONFIG,
+      ctx: /** @type {ExecutionContext} */ ({ waitUntil() {}, passThroughOnException() {} }),
+      effectivePath: '/cr/ghcr/v2/user/repo/manifests/latest',
+      hasSensitiveHeaders: false,
+      monitor: new PerformanceMonitor(),
+      platform: 'cr-ghcr',
+      request,
+      requestContext,
+      response: new Response('denied', {
+        status: 401,
+        headers: { 'Content-Type': 'text/plain' }
+      }),
+      responseGeneratedLocally: false,
+      url: new URL(request.url)
+    });
+
+    expect(customUnauthorized.status).toBe(401);
+    expect(await customUnauthorized.text()).toContain('UNAUTHORIZED');
+    expect(plainUnauthorized.status).toBe(401);
+    expect(await plainUnauthorized.text()).toContain('Original error: denied');
+  });
 });
