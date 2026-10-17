@@ -1,3 +1,15 @@
+<!-- renoise-banner -->
+<p align="center">
+  <a href="https://renoise.ai/plugin?utm_medium=github&utm_source=xixu">
+    <img src="https://raw.githubusercontent.com/ArcoCodes/renoise-plugins-official/main/assets/icon.svg" alt="Renoise" width="96">
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://renoise.ai/plugin?utm_medium=github&utm_source=xixu">Renoise MCP</a> · <a href="https://github.com/ArcoCodes/renoise-plugins-official">Renoise Skills &amp; CLI</a><br><br>
+  <strong>模型、数据集、包下载全面加速，再把素材变成口播视频，完全不用手搓时间线。</strong>
+</p>
+
 <div align="center">
 
 # Xget 🚀

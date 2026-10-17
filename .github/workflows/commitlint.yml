@@ -47,7 +47,10 @@ jobs:
             TO="${{ github.sha }}"
           fi
 
-          if [[ "$FROM" == "0000000000000000000000000000000000000000" ]]; then
+          # A force-push or squash can leave the event's previous SHA outside
+          # the fetched history. In that case, validate the new tip instead
+          # of passing an invalid revision range to commitlint.
+          if [[ "$FROM" == "0000000000000000000000000000000000000000" ]] || ! git cat-file -e "$FROM^{commit}" 2>/dev/null; then
             npx commitlint --last --verbose
           else
             npx commitlint --from "$FROM" --to "$TO" --verbose

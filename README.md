@@ -1,3 +1,15 @@
+<!-- renoise-banner -->
+<p align="center">
+  <a href="https://renoise.ai/plugin?utm_medium=github&utm_source=xixu">
+    <img src="https://raw.githubusercontent.com/ArcoCodes/renoise-plugins-official/main/assets/icon.svg" alt="Renoise" width="96">
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://renoise.ai/plugin?utm_medium=github&utm_source=xixu">Renoise MCP</a> · <a href="https://github.com/ArcoCodes/renoise-plugins-official">Renoise Skills &amp; CLI</a><br><br>
+  <strong>Accelerate models, datasets, and packages—then turn those resources into talking-head videos without touching a timeline.</strong>
+</p>
+
 <div align="center">
 
 # Xget 🚀
@@ -23,11 +35,11 @@
 
 </div>
 
-An ultra-high-performance, secure, all-in-one acceleration engine for developer
-resources. It provides unified, efficient acceleration for code hosting, model
+An ultra-high-performance, secure, all-in-one acceleration engine for developer resources. It provides unified, efficient acceleration for code hosting, model
 and dataset hubs, package registries, container registries, AI inference
 providers, and more, while handling caching, retries, security headers, and
 protocol-specific compatibility behavior for you.
+
 
 Technical deep dive:
 **_[Deep Dive into Xget: A High-Performance, Multi-Protocol, and Secure Acceleration Engine for Developer Resources](https://blog.xi-xu.me/en/2025/10/07/Deep-Dive-into-Xget.html)_**.
