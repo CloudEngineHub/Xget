@@ -1,12 +1,12 @@
 <!-- renoise-banner -->
 <p align="center">
   <a href="https://renoise.ai/plugin?utm_medium=github&utm_source=xixu">
-    <img src="https://raw.githubusercontent.com/ArcoCodes/renoise-plugins-official/main/assets/icon.svg" alt="Renoise" width="96">
+    <img src="https://raw.githubusercontent.com/renoise-ai/renoise-plugins-official/main/assets/icon.svg" alt="Renoise" width="96">
   </a>
 </p>
 
 <p align="center">
-  <a href="https://renoise.ai/plugin?utm_medium=github&utm_source=xixu">Renoise MCP</a> · <a href="https://github.com/ArcoCodes/renoise-plugins-official">Renoise Skills &amp; CLI</a><br><br>
+  <a href="https://renoise.ai/plugin?utm_medium=github&utm_source=xixu">Renoise MCP</a> · <a href="https://github.com/renoise-ai/renoise-plugins-official">Renoise Skills &amp; CLI</a><br><br>
   <strong>模型、資料集、套件下載全面加速，再把素材變成口播影片，完全不用手搓時間線。</strong>
 </p>
 
