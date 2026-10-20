@@ -84,6 +84,9 @@ jobs:
         env:
           CI: true
 
+      - name: Test offline CLI and standalone package
+        run: npm run test:cli
+
       - name: Generate coverage report
         run: npm run test:coverage
         env:

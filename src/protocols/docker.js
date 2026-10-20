@@ -20,8 +20,16 @@
  * Docker/OCI Registry protocol handler for Xget
  */
 
-import { SORTED_PLATFORMS } from '../routing/platform-index.js';
+import { SORTED_PLATFORMS, getPlatformPathPrefix } from '../routing/platform-index.js';
+import {
+  extractRepositoryPath,
+  normalizeRegistryApiPath,
+  normalizeRepoPath
+} from '../routing/registry-path.js';
+
 import { createErrorResponse } from '../utils/security.js';
+
+export { normalizeRegistryApiPath } from '../routing/registry-path.js';
 
 /**
  * Parses Docker/OCI registry WWW-Authenticate header.
@@ -123,7 +131,7 @@ export async function readRegistryTokenResponse(response) {
  */
 export function getScopeFromUrl(url, effectivePath, platform) {
   void url;
-  const platformPrefix = `/${platform.replace(/-/g, '/')}/`;
+  const platformPrefix = getPlatformPathPrefix(platform);
 
   // Check for catalog endpoint
   if (effectivePath.includes('/_catalog')) {
@@ -143,67 +151,6 @@ export function getScopeFromUrl(url, effectivePath, platform) {
   }
 
   return '';
-}
-
-/**
- * Normalizes Docker Hub official images to the canonical library namespace.
- * @param {string} platformKey
- * @param {string} repoPath
- * @returns {string} Normalized upstream repository path.
- */
-function normalizeRepoPath(platformKey, repoPath) {
-  if (platformKey === 'cr-docker' && repoPath && !repoPath.includes('/')) {
-    return `library/${repoPath}`;
-  }
-
-  return repoPath;
-}
-
-/**
- * Extracts the repository path from a Docker registry API path.
- * @param {string} apiPath
- * @returns {string} Repository path without the `/v2/` prefix or operation suffix.
- */
-function extractRepositoryPath(apiPath) {
-  const normalizedPath = apiPath.startsWith('/v2/')
-    ? apiPath.slice(4)
-    : apiPath.replace(/^\/+/, '');
-  const pathParts = normalizedPath.split('/').filter(Boolean);
-
-  if (pathParts.length === 0 || pathParts[0].startsWith('_')) {
-    return '';
-  }
-
-  const suffixIndex = pathParts.findIndex(part =>
-    ['manifests', 'blobs', 'tags', 'referrers'].includes(part)
-  );
-
-  if (suffixIndex <= 0) {
-    return '';
-  }
-
-  return pathParts.slice(0, suffixIndex).join('/');
-}
-
-/**
- * Normalizes a Docker registry API path for upstream compatibility.
- * @param {string} platformKey
- * @param {string} apiPath
- * @returns {string} Upstream API path with any registry-specific normalization applied.
- */
-export function normalizeRegistryApiPath(platformKey, apiPath) {
-  if (platformKey !== 'cr-docker' || !apiPath.startsWith('/v2/')) {
-    return apiPath;
-  }
-
-  const repoPath = extractRepositoryPath(apiPath);
-  const normalizedRepoPath = normalizeRepoPath(platformKey, repoPath);
-
-  if (!repoPath || normalizedRepoPath === repoPath) {
-    return apiPath;
-  }
-
-  return apiPath.replace(`/v2/${repoPath}`, `/v2/${normalizedRepoPath}`);
 }
 
 /**
@@ -229,7 +176,7 @@ function resolveDockerAuthTarget(url, platforms) {
         for (const key of SORTED_PLATFORMS) {
           if (!key.startsWith('cr-')) continue;
 
-          const prefix = key.replace(/-/g, '/');
+          const prefix = getPlatformPathPrefix(key).slice(1, -1);
           if (fullRepoPath.startsWith(`${prefix}/`)) {
             platformKey = key;
             repoPath = fullRepoPath.slice(prefix.length + 1);

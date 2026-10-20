@@ -16,9 +16,10 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { SORTED_PLATFORMS } from './platform-index.js';
+import { PLATFORM_DEFINITIONS } from '../config/platform-catalog.js';
+import { getPlatformPathPrefix, matchPlatformPath } from './platform-index.js';
 import { transformPath } from './platform-transformers.js';
-import { normalizeRegistryApiPath } from '../protocols/docker.js';
+import { normalizeRegistryApiPath } from './registry-path.js';
 import { shouldVaryCacheByOrigin } from '../upstream/cache-policy.js';
 import { createErrorResponse } from '../utils/security.js';
 
@@ -78,18 +79,17 @@ export function normalizeEffectivePath(url, isDocker) {
  * } | { response: Response }} Target metadata or an early redirect response.
  */
 export function resolveTarget(url, effectivePath, platforms) {
-  const platform =
-    SORTED_PLATFORMS.find(key => {
-      const expectedPrefix = `/${key.replace('-', '/')}/`;
-      return effectivePath.startsWith(expectedPrefix);
-    }) || effectivePath.split('/')[1];
+  const platform = matchPlatformPath(effectivePath);
 
   if (!platform || !platforms[platform]) {
     return { response: createHomepageRedirect() };
   }
 
-  const platformPath = `/${platform.replace(/-/g, '/')}`;
-  if (effectivePath === platformPath || effectivePath === `${platformPath}/`) {
+  const platformPath = getPlatformPathPrefix(platform).slice(0, -1);
+  if (
+    effectivePath === platformPath ||
+    (effectivePath === `${platformPath}/` && !PLATFORM_DEFINITIONS[platform]?.conversion.rootRoute)
+  ) {
     return { response: createHomepageRedirect() };
   }
 

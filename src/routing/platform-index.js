@@ -33,3 +33,15 @@ export function getPlatformPathPrefix(platformKey) {
 export const SORTED_PLATFORMS = Object.keys(PLATFORM_CATALOG).sort((a, b) => {
   return getPlatformPathPrefix(b).length - getPlatformPathPrefix(a).length;
 });
+
+/**
+ * Matches a route on complete path segments, preferring the longest prefix.
+ * @param {string} path
+ * @returns {string | undefined} Matching platform key, if the path is routable.
+ */
+export function matchPlatformPath(path) {
+  return SORTED_PLATFORMS.find(key => {
+    const prefix = getPlatformPathPrefix(key);
+    return path.startsWith(prefix) || path === prefix.slice(0, -1);
+  });
+}

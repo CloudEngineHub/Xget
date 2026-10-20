@@ -96,6 +96,13 @@
 
 **Agent Skills：`npx skills add xixu-me/skills -s xget`**
 
+**离线 CLI（Node.js 22+）：**在当前仓库运行 `npm run build:cli`，然后使用
+`node packages/cli/bin/xget.js capabilities` 查询平台，或使用
+`node packages/cli/bin/xget.js resolve https://github.com/microsoft/vscode --base-url https://your-xget.example`
+转换 URL。CLI 返回带版本的 JSON，无需获取远程源码或文档。打包、兼容规则与
+`/.well-known/xget.json` 实例发现见 [CLI 指南](packages/cli/README.md)和
+[智能体契约](docs/agent-contract.md)。Xget Skill 附带相同 CLI，可在任意项目目录离线使用。
+
 ## 为什么选择 Xget
 
 ### 面向性能的设计

@@ -23,22 +23,26 @@
   "license": "AGPL-3.0-or-later",
   "private": true,
   "scripts": {
+    "build:cli": "node scripts/build-cli.mjs",
+    "cli": "node packages/cli/bin/xget.js",
     "commitlint": "commitlint --last --verbose",
     "commitmsg": "commitlint --edit",
     "deploy": "wrangler deploy",
     "dev": "wrangler dev",
-    "format": "prettier --write src/ test/ *.js *.json",
-    "format:check": "prettier --check src/ test/ *.js *.json",
-    "lint": "eslint src/ test/ adapters/",
-    "lint:fix": "eslint src/ test/ adapters/ --fix",
+    "format": "prettier --write src/ test/ packages/cli/ scripts/*.mjs *.js *.json",
+    "format:check": "prettier --check src/ test/ packages/cli/ scripts/*.mjs *.js *.json",
+    "lint": "eslint src/ test/ adapters/ packages/cli/bin/ packages/cli/lib/ scripts/*.mjs",
+    "lint:fix": "eslint src/ test/ adapters/ packages/cli/bin/ packages/cli/lib/ scripts/*.mjs --fix",
+    "pack:cli": "npm run build:cli && npm pack ./packages/cli",
     "prepare": "simple-git-hooks",
     "start": "wrangler dev",
     "test": "vitest",
     "test:coverage": "vitest run --config vitest.coverage.config.js --coverage",
     "test:run": "vitest run",
+    "test:cli": "npm run build:cli && node --test test/cli/*.test.mjs",
     "test:ui": "vitest --ui",
     "test:watch": "vitest --watch",
-    "type-check": "tsc --noEmit"
+    "type-check": "npm run build:cli && tsc --noEmit"
   },
   "simple-git-hooks": {
     "commit-msg": "npx commitlint --edit $1"

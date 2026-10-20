@@ -6,6 +6,7 @@ export default defineConfig({
     hookTimeout: 30000,
     include: [
       'test/features/auth.test.js',
+      'test/features/discovery.test.js',
       'test/unit/**/*.test.js',
       'test/platforms/crates.test.js',
       'test/platforms/cran.test.js',

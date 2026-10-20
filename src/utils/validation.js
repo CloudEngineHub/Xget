@@ -21,6 +21,7 @@
  */
 
 import { CONFIG } from '../config/index.js';
+import { DISCOVERY_PATH } from '../contracts/version.js';
 
 // Imported protocol checks
 import { isAIInferenceRequest } from '../protocols/ai.js';
@@ -178,6 +179,9 @@ export { isAIInferenceRequest, isGitLFSRequest, isGitRequest, isHuggingFaceAPIRe
  * @returns {string[]} Allowed HTTP methods for this request shape.
  */
 export function getAllowedMethods(request, url, config = CONFIG) {
+  if (url.pathname === DISCOVERY_PATH) {
+    return ['GET', 'HEAD'];
+  }
   const traits = getRequestTraits(request, url);
 
   return isProtocolRequest(traits)

@@ -6,7 +6,15 @@ export default [
   js.configs.recommended,
   jsdoc.configs['flat/recommended'],
   {
-    files: ['src/**/*.js', 'test/**/*.js', 'adapters/**/*.js'],
+    files: [
+      'src/**/*.js',
+      'test/**/*.js',
+      'test/cli/**/*.mjs',
+      'adapters/**/*.js',
+      'packages/cli/bin/**/*.js',
+      'packages/cli/lib/**/*.js',
+      'scripts/*.mjs'
+    ],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: 'module',
