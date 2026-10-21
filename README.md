@@ -112,6 +112,15 @@ supported platform URL to Xget's acceleration format with one click
 
 **Agent Skills: `npx skills add xixu-me/skills -s xget`**
 
+**Offline CLI (Node.js 22+):** Build from this checkout with `npm run build:cli`,
+then run `node packages/cli/bin/xget.js capabilities` or
+`node packages/cli/bin/xget.js resolve https://github.com/microsoft/vscode --base-url https://your-xget.example`.
+The CLI returns versioned JSON and does not fetch remote source or documentation.
+See the [CLI guide](packages/cli/README.md) and
+[agent contract](docs/agent-contract.md) for packaging, compatibility, and
+`/.well-known/xget.json` instance discovery. The Xget Skill bundles the same CLI
+for offline use from any project directory.
+
 ## Why Xget
 
 ### Performance-Oriented Design

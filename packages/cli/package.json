@@ -1,0 +1,25 @@
+{
+  "name": "@xixu-me/xget-cli",
+  "version": "0.1.0",
+  "description": "Offline, machine-readable URL conversion for Xget",
+  "type": "module",
+  "license": "AGPL-3.0-or-later",
+  "engines": {
+    "node": ">=22"
+  },
+  "bin": {
+    "xget": "bin/xget.js"
+  },
+  "files": [
+    "bin/",
+    "lib/",
+    "shared/",
+    "LICENSE",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xixu-me/Xget.git",
+    "directory": "packages/cli"
+  }
+}

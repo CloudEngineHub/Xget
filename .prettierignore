@@ -78,6 +78,10 @@ Thumbs.db
 # Wrangler
 .wrangler/
 
+# Generated CLI distribution
+packages/cli/shared/
+packages/cli/LICENSE
+
 # Git
 .git/
 

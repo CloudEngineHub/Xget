@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { PLATFORM_CATALOG } from '../config/platform-catalog.js';
+import { PLATFORM_DEFINITIONS } from '../config/platform-catalog.js';
 import { getPlatformPathPrefix } from './platform-index.js';
 
 /**
@@ -96,9 +96,9 @@ function transformJenkinsPath(transformedPath) {
 
 /** @type {{ [key: string]: (transformedPath: string) => string }} */
 const PLATFORM_PATH_TRANSFORMERS = {
-  crates: transformCratesPath,
-  fedora: transformFedoraPath,
-  jenkins: transformJenkinsPath
+  'crates-api': transformCratesPath,
+  'fedora-mirror': transformFedoraPath,
+  'jenkins-current': transformJenkinsPath
 };
 
 /**
@@ -108,12 +108,13 @@ const PLATFORM_PATH_TRANSFORMERS = {
  * @returns {string} Upstream-ready request path.
  */
 export function transformPath(path, platformKey) {
-  if (!PLATFORM_CATALOG[platformKey]) {
+  const definition = PLATFORM_DEFINITIONS[platformKey];
+  if (!definition) {
     return path;
   }
 
   const transformedPath = stripPlatformPrefix(path, platformKey);
-  const transformPlatformPath = PLATFORM_PATH_TRANSFORMERS[platformKey];
+  const transformPlatformPath = PLATFORM_PATH_TRANSFORMERS[definition.conversion.rule];
 
   return transformPlatformPath ? transformPlatformPath(transformedPath) : transformedPath;
 }

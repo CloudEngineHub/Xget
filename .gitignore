@@ -170,3 +170,7 @@ dist
 
 .dev.vars
 .wrangler/
+
+# CLI distribution files generated from the authoritative source
+packages/cli/shared/
+packages/cli/LICENSE

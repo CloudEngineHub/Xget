@@ -13,5 +13,11 @@
     "types": ["node"]
   },
   "exclude": ["node_modules", "dist", "coverage"],
-  "include": ["src/**/*", "test/**/*", "node_modules/@cloudflare/vitest-pool-workers/types/**/*"]
+  "include": [
+    "src/**/*",
+    "test/**/*",
+    "packages/cli/bin/**/*.js",
+    "packages/cli/lib/**/*.js",
+    "node_modules/@cloudflare/vitest-pool-workers/types/**/*"
+  ]
 }

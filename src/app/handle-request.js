@@ -9,6 +9,8 @@
  */
 
 import { handleDockerAuth } from '../protocols/docker.js';
+import { createDiscoveryResponse } from './discovery.js';
+import { DISCOVERY_PATH } from '../contracts/version.js';
 import { finalizeResponse } from '../response/finalize-response.js';
 import {
   createHomepageRedirect,
@@ -46,7 +48,10 @@ export async function handleRequest(request, env, ctx) {
       );
 
       if (!allowedMethods.includes(requestedMethod)) {
-        response = createErrorResponse('Method not allowed', 405);
+        response =
+          url.pathname === DISCOVERY_PATH
+            ? createDiscoveryResponse(request)
+            : createErrorResponse('Method not allowed', 405);
       } else {
         const headers = addCorsHeaders(new Headers(), request, config);
         if (!headers.has('Access-Control-Allow-Origin')) {
@@ -58,8 +63,9 @@ export async function handleRequest(request, env, ctx) {
           response = new Response(null, { status: 204, headers });
         }
       }
+    } else if (url.pathname === DISCOVERY_PATH) {
+      response = createDiscoveryResponse(request);
     }
-
     // Handle Docker API version check
     else if (isDocker && (url.pathname === '/v2/' || url.pathname === '/v2')) {
       const headers = new Headers({
@@ -187,6 +193,9 @@ export async function handleRequest(request, env, ctx) {
 
   const responseWithCors = (() => {
     const headers = addCorsHeaders(new Headers(response.headers), request, config);
+    if (url.pathname === DISCOVERY_PATH && headers.has('Access-Control-Allow-Origin')) {
+      headers.set('Access-Control-Allow-Methods', 'GET, HEAD');
+    }
     return new Response(response.body, {
       status: response.status,
       statusText: response.statusText,
